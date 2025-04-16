@@ -34,7 +34,7 @@ setup(
     cmdclass = {'test': Tox},
     zip_safe=False,
     install_requires=[
-        "sqlalchemy>=1.3.0"
+        "sqlalchemy>=1.3.0,<1.4"
     ],
     python_requires='>=3.6',
     tests_require=['tox'],

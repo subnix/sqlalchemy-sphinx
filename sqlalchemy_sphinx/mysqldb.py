@@ -44,7 +44,7 @@ class Dialect(SphinxDialect, mysqldb_dialect.MySQLDialect_mysqldb):
         pass
 
     def escape_value(self, value):
-        value = MySQLdb.escape_string(value.encode('utf8'))
+        value = MySQLdb._mysql.escape_string(value.encode('utf8'))
         return value.decode('utf8')
 
     @classmethod

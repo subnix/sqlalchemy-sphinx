@@ -44,7 +44,7 @@ class Dialect(SphinxDialect, pymysql_dialect.MySQLDialect_pymysql):
         pass
 
     def escape_value(self, value):
-        return pymysql.escape_string(value)
+        return pymysql.converters.escape_string(value)
 
     @classmethod
     def dbapi(cls):
