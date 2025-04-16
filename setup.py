@@ -34,9 +34,9 @@ setup(
     cmdclass = {'test': Tox},
     zip_safe=False,
     install_requires=[
-        "sqlalchemy>=1.3.0; python_version == '2.7' or python_version >= '3.4'",
-        "sqlalchemy>=1.3.0; python_version < '2.7'"
+        "sqlalchemy>=1.3.0"
     ],
+    python_requires='>=3.6',
     tests_require=['tox'],
     entry_points={
      'sqlalchemy.dialects': [
