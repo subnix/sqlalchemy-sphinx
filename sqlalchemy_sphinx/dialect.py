@@ -239,7 +239,7 @@ class SphinxCompiler(compiler.SQLCompiler):
 
                     left_tuple.append(func_left)
                     right_tuple.append(func_right)
-            elif isinstance(clause, ClauseList):
+            elif isinstance(clause, (ClauseList, BooleanClauseList)):
                 for xclause in clause.clauses:
                     l, r, m = check_match_clause(xclause)
                     left_tuple.extend(l)
@@ -289,6 +289,7 @@ class SphinxDialect(default.DefaultDialect):
 
     name = "sphinx"
     statement_compiler = SphinxCompiler
+    supports_statement_cache = False
 
     # TODO HACK : Prevent SQLalchemy to send the request
     # 'SELECT 'X' as some_label;' as it is not supported by Sphinx

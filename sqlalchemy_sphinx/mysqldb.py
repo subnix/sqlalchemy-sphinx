@@ -19,6 +19,7 @@ class DBAPIShim(object):
 
 
 class Dialect(SphinxDialect, mysqldb_dialect.MySQLDialect_mysqldb):
+    supports_statement_cache = False
 
     def _get_default_schema_name(self, connection):
         """Prevent 'SELECT DATABASE()' being executed"""
@@ -50,3 +51,5 @@ class Dialect(SphinxDialect, mysqldb_dialect.MySQLDialect_mysqldb):
     @classmethod
     def dbapi(cls):
         return DBAPIShim()
+
+    import_dbapi = dbapi

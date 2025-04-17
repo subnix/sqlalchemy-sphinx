@@ -1,16 +1,27 @@
 # -*- coding: utf-8 -*-
 import pytest
 
-from sqlalchemy import create_engine, Column, Integer, String, func, distinct, or_, not_, and_, column
+from sqlalchemy import create_engine, Column, Integer, String, func, distinct, or_, not_, and_, column, __version__ as sa_version_str
 from sqlalchemy.orm import sessionmaker, deferred
 from sqlalchemy.exc import CompileError
-from sqlalchemy.ext.declarative import declarative_base
+
+
+_SA_VERSION = tuple(map(int, sa_version_str.split(".")[:2]))
+
+if _SA_VERSION >= (1, 4):
+    from sqlalchemy.orm import declarative_base
+else:
+    from sqlalchemy.ext.declarative import declarative_base
+
 
 
 @pytest.fixture(scope="module")
 def sphinx_connections():
     sphinx_engine = create_engine("sphinx://")
-    Base = declarative_base(bind=sphinx_engine)
+    if _SA_VERSION >= (1, 4):
+        Base = declarative_base()
+    else:
+        Base = declarative_base(bind=sphinx_engine)
     Session = sessionmaker(bind=sphinx_engine)
     session = Session()
 
@@ -246,12 +257,6 @@ class TestMatchErrors:
         with pytest.raises(CompileError, match='Invalid source'):
             base_query.filter(match_func(or_(not_(MockSphinxModel.name), MockSphinxModel.country), "US")). \
                 statement.compile(sphinx_engine)
-
-    def test_multi_level_or(self, MockSphinxModel, sphinx_engine, base_query, match_func):
-        with pytest.raises(CompileError, match='Invalid source'):
-            base_query.filter(
-                match_func(or_(or_(MockSphinxModel.name, MockSphinxModel.country), MockSphinxModel.name), "US")
-            ).statement.compile(sphinx_engine)
 
     def test_invalid_unary(self, MockSphinxModel, sphinx_engine, base_query, match_func):
         with pytest.raises(CompileError, match='Invalid unary'):

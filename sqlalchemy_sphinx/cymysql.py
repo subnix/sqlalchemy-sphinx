@@ -21,6 +21,7 @@ class DBAPIShim(object):
 
 
 class Dialect(SphinxDialect, cymysql_dialect.MySQLDialect_cymysql):
+    supports_statement_cache = False
 
     def _get_default_schema_name(self, connection):
         """Prevent 'SELECT DATABASE()' being executed"""
@@ -52,3 +53,5 @@ class Dialect(SphinxDialect, cymysql_dialect.MySQLDialect_cymysql):
     @classmethod
     def dbapi(cls):
         return DBAPIShim()
+
+    import_dbapi = dbapi
