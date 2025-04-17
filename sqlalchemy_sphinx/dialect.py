@@ -2,22 +2,37 @@
 
 import operator
 
+from sqlalchemy import (
+    __version__ as sa_version_str,
+    util,
+)
 from sqlalchemy.engine import default
 from sqlalchemy.exc import CompileError
-from sqlalchemy.sql import compiler
-from sqlalchemy.sql import expression as sql
-from sqlalchemy.sql.functions import Function
+from sqlalchemy.sql import (
+    compiler,
+    expression as sql,
+)
 from sqlalchemy.sql.elements import (
-    ClauseList, UnaryExpression, BooleanClauseList, Grouping,
-    ColumnClause, BindParameter
+    BindParameter,
+    BooleanClauseList,
+    ClauseList,
+    ColumnClause,
+    Grouping,
+    UnaryExpression,
+)
+from sqlalchemy.sql.functions import Function
+from sqlalchemy.types import MatchType
+
+from sqlalchemy_sphinx.utils import (
+    escape_percent_char,
+    escape_special_chars,
 )
 
-from sqlalchemy.types import MatchType
-from sqlalchemy import util
 
-from sqlalchemy_sphinx.utils import escape_special_chars, escape_percent_char
+__all__ = ("SphinxDialect",)
 
-__all__ = ("SphinxDialect")
+
+_SA_VERSION = tuple(map(int, sa_version_str.split(".")[:2]))
 
 
 class SphinxCompiler(compiler.SQLCompiler):
@@ -154,11 +169,16 @@ class SphinxCompiler(compiler.SQLCompiler):
                      asfrom=False, parens=True, iswrapper=False,
                      fromhints=None, compound_index=1, force_result_map=False,
                      nested_join_translation=False, **kwargs):
+        if _SA_VERSION > (1, 3):
+            select = select._compile_state_factory(
+                select, self, **kwargs
+            ).statement
+
         entry = self.stack and self.stack[-1] or {}
 
         existingfroms = entry.get('from', None)
 
-        froms = select._get_display_froms(existingfroms)
+        froms = self._display_froms_for_select(select, existingfroms)
 
         correlate_froms = set(sql._from_objects(*froms))
 
