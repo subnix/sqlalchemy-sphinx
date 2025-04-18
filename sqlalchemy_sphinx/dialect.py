@@ -276,10 +276,9 @@ class SphinxCompiler(compiler.SQLCompiler):
         if select._limit is not None:
             text += self.limit_clause(select)
 
-        if hasattr(self, "options_list"):
-            if self.options_list:
-                option_text = " OPTION {0}".format(", ".join(self.options_list))
-                text += option_text
+        if getattr(self, "options_list", None):
+            option_text = " OPTION {0}".format(", ".join(self.options_list))
+            text += option_text
 
         self.stack.pop(-1)
         return text
